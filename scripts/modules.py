@@ -1,9 +1,10 @@
 # importing libraries
 
 from msvcrt import getch
-from os import environ, getcwd, path, system
+from os import environ, getcwd, path, system, makedirs
 from subprocess import run
 from sys import exit
+from shutil import rmtree
 
 
 
@@ -11,7 +12,7 @@ from sys import exit
 # defined variables and lambda functions
 
 exec = lambda cmd: run(cmd,capture_output=True).stdout
-
+makedir = lambda dir: makedirs(dir,exist_ok=True)
 
 
 
@@ -26,11 +27,19 @@ def initialize():
     system('cls')
 
 def safe_exit():
-    # ADB.stop()
+    # function to exit tool properly
+    ADB.stop()
+    rmtree('cache')
     print('\nPress any key to exit . . . ',end='',flush=True)
     getch()
     exit()
 
+def subtask(task=None,indent=1):
+    # function to print subtasks
+    if task is None:
+        print('\t'*indent+'Done')
+    else:
+        print(f' > {task}'+'\t'*indent+':',end='',flush=True)
 
 class ADB:
     # class for ADB functions
@@ -48,6 +57,18 @@ class ADB:
     def stop():
         # stops ADB server
         exec('adb kill-server')
+    
+    def push(src,dst):
+        # pushes a file to android
+        exec(f'adb push "{src}" "{dst}"')
+    
+    def pull(src,dst):
+        # pulls a file from android
+        exec(f'adb pull "{src}" "{dst}"')
+    
+    def remove(file):
+        # deletes a file from android
+        exec(f'adb shell rm "{file}"')
     
     def get_device():
         # function the get connected device details

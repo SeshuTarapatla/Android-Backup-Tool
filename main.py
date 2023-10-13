@@ -11,6 +11,9 @@ if __name__ == '__main__':
     initialize()
     device,id = ADB.get_device()
     
+    # stages
+    stage1().run()
+    
     
     # exit the tool
     safe_exit()
