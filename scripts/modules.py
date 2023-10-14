@@ -32,8 +32,8 @@ def initialize():
 
 def safe_exit():
     # function to exit tool properly
-    # ADB.stop()
-    # if path.isdir('cache'): rmtree('cache')
+    ADB.stop()
+    if path.isdir('cache'): rmtree('cache')
     print('\nPress any key to exit . . . ',end='',flush=True)
     getch()
     exit()

@@ -60,6 +60,7 @@ class stage2:
         name = ' '.join(data[6:])
         type = path.splitext(name)[1][1:].lower()
         if type:
+            name = f'{data[6]}{data[6].join(row.split(data[6])[1:])}'
             size = int(data[3])
             date = ' '.join(data[4:6])
             return (name,type,size,date)

@@ -73,8 +73,9 @@ class stage3:
             for j in part.itertuples():
                 src_file = '/'.join((i.Folder,j.File))
                 dst_file = '\\'.join((dir,j.File))
-                op = ADB.pull(src_file,dst_file)
-                if op.returncode != 0: self.logs.append(src_file+'\n')
+                if not path.isfile(dst_file):
+                    op = ADB.pull(src_file,dst_file)
+                    if op.returncode != 0: self.logs.append(src_file+'\n')
                 self.pbar_update(j)
         self.pbar.close()
     
