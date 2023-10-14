@@ -1,21 +1,21 @@
 # importing libraries
 
 from msvcrt import getch
+from numpy import cumsum, diff, linspace
 from openpyxl import load_workbook
 from openpyxl.styles import Font
 from os import environ, getcwd, makedirs, path, system
-from pandas import DataFrame, concat
+from pandas import DataFrame, concat, read_csv
 from shutil import rmtree
 from subprocess import run
 from sys import exit
-
-
+from tqdm import tqdm
 
 
 # defined variables and lambda functions
 
 ENC = 'utf-8'
-exec = lambda cmd: run(cmd,capture_output=True).stdout
+exec = lambda cmd: run(cmd,capture_output=True)
 makedir = lambda dir: makedirs(dir,exist_ok=True)
 
 
@@ -32,8 +32,8 @@ def initialize():
 
 def safe_exit():
     # function to exit tool properly
-    ADB.stop()
-    rmtree('cache')
+    # ADB.stop()
+    # if path.isdir('cache'): rmtree('cache')
     print('\nPress any key to exit . . . ',end='',flush=True)
     getch()
     exit()
@@ -64,25 +64,25 @@ class ADB:
     
     def push(src,dst):
         # pushes a file to android
-        exec(f'adb push "{src}" "{dst}"')
+        return exec(f'adb push "{src}" "{dst}"')
     
     def pull(src,dst):
         # pulls a file from android
-        exec(f'adb pull "{src}" "{dst}"')
+        return exec(f'adb pull "{src}" "{dst}"')
     
     def remove(file):
         # deletes a file from android
-        exec(f'adb shell rm "{file}"')
+        return exec(f'adb shell rm "{file}"')
     
     def get_device():
         # function the get connected device details
-        resp = exec('adb devices').decode().splitlines()
+        resp = exec('adb devices').stdout.decode().splitlines()
         if len(resp) < 3:
             print(f'No device is connected. Please refer readme.')
             safe_exit()
         else:
             id = resp[1].split('\t')[0]
-            device = exec(f'adb -s {id} shell getprop ro.product.product.name').decode()[:-2]
+            device = exec(f'adb -s {id} shell getprop ro.product.product.model').stdout.decode()[:-2]
             print(f'Device connected: {device} | ID: {id}')
             return (device,id)
 

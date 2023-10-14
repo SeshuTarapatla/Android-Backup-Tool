@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # stages
     stage1().run()
     stage2().run()
-    
+    stage3(device).run()
     
     # exit the tool
     safe_exit()
