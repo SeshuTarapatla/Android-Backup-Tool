@@ -10,6 +10,8 @@ class stage2:
         self.dir_db = DataFrame(columns=['Folder','Count','Size'])
         self.file_db = DataFrame(columns=['File','FID','Type','Category','Size','Date'])
         self.categories = categories()
+        with open('data\\ignore.txt') as file:
+            self.ignore = file.read().splitlines()
     
     def run(self):
         # subtasks
@@ -100,6 +102,18 @@ class stage2:
             if file in files:
                 index = part[part['File'] == file].index
                 self.file_db.loc[index,'Category'] = ''
+        
+        # removing thumbnail files
+        dirs = self.dir_db[self.dir_db['Folder'].apply(lambda x: x.endswith('.thumbnails'))]
+        for fid in dirs.index:
+            part = self.file_db['FID'] == fid
+            self.file_db.loc[part,'Category'] = ''
+        
+        # removing ignore files:
+        for dir in self.ignore:
+            fid = self.dir_db[self.dir_db['Folder'] == dir]
+            part = self.file_db['FID'] == fid.index[0]
+            self.file_db.loc[part,'Category'] = ''
         
         # new dataframes
         db1 = DataFrame(columns=self.dir_db.columns)
