@@ -38,6 +38,32 @@ def safe_exit():
     getch()
     exit()
 
+def parse_config(device,file='data\\config.txt'):
+    config = {}
+    config['device'] = device
+    if path.isfile(file):
+        # parsing values from config file
+        with open(file,'r') as file:
+            for line in file.readlines():
+                prop,value = line.split('=')
+                config[prop.strip()] = value.strip()
+    else:
+        # if no config exists, default values
+        config['mode'] = 1
+        config['output'] = path.join(getcwd(),device)
+    
+    # fault check
+    if config['mode'] not in ['0','1','2']: config['mode'] = 1
+    else: config['mode'] = int(config['mode'])
+    try:
+        makedir(config['output'])
+        if not config['output'].endswith(device): 
+            config['output'] = path.join(config['output'],device)
+    except:
+        config['output'] = path.join(getcwd(),device)
+    print(f'Backup directory: "{config["output"]}" | Mode: {config["mode"]}')
+    return config
+
 def subtask(task=None,indent=1):
     # function to print subtasks
     if task is None:
