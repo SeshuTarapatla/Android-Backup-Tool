@@ -112,8 +112,9 @@ class stage2:
         # removing ignore files:
         for dir in self.ignore:
             fid = self.dir_db[self.dir_db['Folder'] == dir]
-            part = self.file_db['FID'] == fid.index[0]
-            self.file_db.loc[part,'Category'] = ''
+            if len(fid):
+                part = self.file_db['FID'] == fid.index[0]
+                self.file_db.loc[part,'Category'] = ''
         
         # new dataframes
         db1 = DataFrame(columns=self.dir_db.columns)
