@@ -32,18 +32,17 @@ def initialize():
 
 def safe_exit():
     # function to exit tool properly
-    ADB.stop()
-    if path.isdir('cache'): rmtree('cache')
+    # ADB.stop()
+    # if path.isdir('cache'): rmtree('cache')
     print('\nPress any key to exit . . . ',end='',flush=True)
     getch()
     exit()
 
-def parse_config(device,file='data\\config.txt'):
+def parse_config(device,cfile='data\\config.txt'):
     config = {}
-    config['device'] = device
-    if path.isfile(file):
+    if path.isfile(cfile):
         # parsing values from config file
-        with open(file,'r') as file:
+        with open(cfile,'r') as file:
             for line in file.readlines():
                 prop,value = line.split('=')
                 config[prop.strip()] = value.strip()
@@ -53,8 +52,8 @@ def parse_config(device,file='data\\config.txt'):
         config['output'] = path.join(getcwd(),device)
     
     # fault check
-    if config['mode'] not in ['0','1','2']: config['mode'] = 1
-    else: config['mode'] = int(config['mode'])
+    if config['mode'] in ['0','1','2']: config['mode'] = int(config['mode'])
+    else: config['mode'] = 1
     try:
         makedir(config['output'])
         if not config['output'].endswith(device): 
@@ -62,6 +61,11 @@ def parse_config(device,file='data\\config.txt'):
     except:
         config['output'] = path.join(getcwd(),device)
     print(f'Backup directory: "{config["output"]}" | Mode: {config["mode"]}')
+    
+    #saving config as latest
+    with open(cfile,'w') as file:
+        for key in config:
+            file.write(f'{key}={config[key]}\n')
     return config
 
 def subtask(task=None,indent=1):

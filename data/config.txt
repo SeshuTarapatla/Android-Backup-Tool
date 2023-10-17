@@ -1,0 +1,2 @@
+mode=0
+output=D:\Backups\ONEPLUS A6000

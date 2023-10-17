@@ -1,12 +1,14 @@
 # importing libraries
+from venv import create
 from .modules import *
 
 
 
 
 class stage3:
-    def __init__(self,device):
-        self.device = device
+    def __init__(self,config):
+        self.mode = config['mode']
+        self.outdir = config['output']
         self.logs = []
         print('\nStage 3: Downloading files from the device')
     
@@ -15,7 +17,7 @@ class stage3:
         self.load_dbs()
         self.add_percentage()
         self.download_files()
-        self.save_logs()
+        # self.save_logs()
     
     def load_dbs(self):
         subtask('Loading dataframes',2)
@@ -46,7 +48,33 @@ class stage3:
         value = '.'.join([prefix,suffix])
         return value
     
-    def pbar_update(self,row):
+    def download_files(self):
+        subtask('Downloading files',2)
+        print('\tRunning\n')
+        self.make_outdirs()
+        self.set_pbar()
+    
+    def make_outdirs(self):
+        # function that creates output folders based on mode
+        if self.mode == 0:
+            create_dir = lambda x:  makedir('\\'.join([self.outdir]+x.split('/')[1:]))
+            self.dir_db['Folder'].apply(create_dir)
+        elif self.mode == 1:
+            create_dir = lambda x: makedir('\\'.join([self.outdir,x]))
+            list(map(create_dir,self.file_db['Category'].unique()))
+        elif self.mode == 2:
+            create_dir = lambda x,y: makedir('\\'.join([self.outdir,x,y]))
+            for category in self.file_db['Category'].unique():
+                types = self.file_db[self.file_db['Category'] == category]['Type'].unique()
+                list(map(lambda x: create_dir(category,x),types))
+    
+    def set_pbar(self):
+        # function that creats a progress bar for download task
+        self.post_spacing = len(str(self.length))
+        format = '   Progress: {desc}%'+' |{bar}| {postfix}/'+f'{self.length}'+' [{elapsed}<{remaining}]'
+        self.pbar = tqdm(total=sum(self.file_db['Increment']),bar_format=format)
+    
+    def update_pbar(self,row):
         # function that updates the download progress bar
         self.pbar.set_description_str(row.Percentage)
         self.pbar.update(row.Increment)
@@ -60,28 +88,28 @@ class stage3:
         dir[0] = self.device
         return '\\'.join(dir)
     
-    def download_files(self):
-        subtask('Downloading files',2)
-        print('\tRunning\n')
-        self.post_spacing = len(str(self.length))
-        format = '   Progress: {desc}%'+' |{bar}| {postfix}/'+f'{self.length}'+' [{elapsed}<{remaining}]'
-        self.pbar = tqdm(total=sum(self.file_db['Increment']),bar_format=format)
-        for i in self.dir_db.itertuples():
-            dir = self.out_dir(i.Folder)
-            makedir(dir)
-            part = self.file_db[self.file_db['FID'] == i.Index]
-            for j in part.itertuples():
-                src_file = '/'.join((i.Folder,j.File))
-                dst_file = '\\'.join((dir,j.File))
-                if not path.isfile(dst_file):
-                    op = ADB.pull(src_file,dst_file)
-                    if op.returncode != 0: self.logs.append(src_file+'\n')
-                self.pbar_update(j)
-        self.pbar.close()
+    # def download_files(self):
+    #     subtask('Downloading files',2)
+    #     print('\tRunning\n')
+    #     self.post_spacing = len(str(self.length))
+    #     format = '   Progress: {desc}%'+' |{bar}| {postfix}/'+f'{self.length}'+' [{elapsed}<{remaining}]'
+    #     self.pbar = tqdm(total=sum(self.file_db['Increment']),bar_format=format)
+    #     for i in self.dir_db.itertuples():
+    #         dir = self.out_dir(i.Folder)
+    #         makedir(dir)
+    #         part = self.file_db[self.file_db['FID'] == i.Index]
+    #         for j in part.itertuples():
+    #             src_file = '/'.join((i.Folder,j.File))
+    #             dst_file = '\\'.join((dir,j.File))
+    #             if not path.isfile(dst_file):
+    #                 op = ADB.pull(src_file,dst_file)
+    #                 if op.returncode != 0: self.logs.append(src_file+'\n')
+    #             self.pbar_update(j)
+    #     self.pbar.close()
     
-    def save_logs(self):
-        if len(self.logs):
-            print('There are some failed files. Please check the logs.txt')
-            with open('logs.txt','w',encoding=ENC) as file:
-                file.writelines(self.logs)
-        print(f'\n\nBackup complete!')
+    # def save_logs(self):
+    #     if len(self.logs):
+    #         print('There are some failed files. Please check the logs.txt')
+    #         with open('logs.txt','w',encoding=ENC) as file:
+    #             file.writelines(self.logs)
+    #     print(f'\n\nBackup complete!')

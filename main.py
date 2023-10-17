@@ -10,13 +10,11 @@ if __name__ == '__main__':
     initialize()
     device,id = ADB.get_device()
     config = parse_config(device)
-    print(config)
-    safe_exit()
     
     # stages
     stage1().run()
     stage2().run()
-    stage3(device).run()
+    stage3(config).run()
     
     # exit the tool
     safe_exit()
