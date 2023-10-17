@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font
 from os import environ, getcwd, makedirs, path, system
 from pandas import DataFrame, concat, read_csv
-from shutil import rmtree
+from shutil import move, rmtree
 from subprocess import run
 from sys import exit
 from tqdm import tqdm
@@ -159,3 +159,25 @@ class categories:
             for j,type in enumerate(self.data[category]):
                 self.sheet.cell(2+j,1+i).value = type
         self.wb.save('data\\categories.xlsx')
+
+
+class filename:
+    def __init__(self,file):
+        file = path.splitext(file)
+        self.file = file[0]
+        self.type = file[1]
+        self.suffix = 0
+        self.set_suffix()
+    
+    def set_suffix(self):
+        if self.file.endswith(')'):
+            part = self.file[:-1].split('(')+['']
+            if part[1].isdigit():
+                self.suffix = int(part[1])
+                self.file = part[0]
+    
+    def filename(self):
+        if self.suffix == 0:
+            return f'{self.file}{self.type}'
+        else:
+            return f'{self.file} ({self.suffix}){self.type}'

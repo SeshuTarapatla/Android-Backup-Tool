@@ -95,7 +95,11 @@ class stage3:
             part = self.file_db[self.file_db['FID'] == dir.Index]
             for file in part.itertuples():
                 src_file = '/'.join([dir.Folder,file.File])
-                resp = ADB.pull(src_file,dst_dir)
+                dst_file = '\\'.join([dst_dir,file.File])
+                if path.isfile(dst_file):
+                    resp = self.safe_copy(src_file,dst_file,file)
+                else:
+                    resp = ADB.pull(src_file,dst_file)
                 if resp != 0: self.logs.append(f'{src_file}\n')
                 self.update_pbar(file)
     
@@ -104,6 +108,23 @@ class stage3:
 
     def mode_2(self):
         pass
+    
+    def safe_copy(self,src,dst,file):
+        # function to safely copy files with same names
+        if path.getsize(dst) == file.Size:
+            return 0
+        else:
+            ADB.pull(src,'Cache')
+            dst = filename(dst)
+            while True:
+                dst.suffix += 1
+                out = dst.filename()
+                if path.isfile(out):
+                    if path.getsize(out) == file.Size:
+                        return 0
+                else:
+                    move(f'Cache\\{file.File}',out)
+                    return 0
 
     # def out_dir(self,dir):
     #     # function that gives the output dir for ADB pull
