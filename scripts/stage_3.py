@@ -29,6 +29,8 @@ class stage3:
         # function to add percentages to each file progress
         subtask('Pre-calculating percentages')
         subtask()
+        order = [['FID'],['Category'],['Category','Type']][self.mode]
+        self.file_db.sort_values(by=order,inplace=True,ignore_index=True)
         total = sum(self.file_db['Size'])
         self.length = len(self.file_db)
         coeff = 0.8
@@ -51,8 +53,12 @@ class stage3:
     def download_files(self):
         subtask('Downloading files',2)
         print('\tRunning\n')
-        self.make_outdirs()
+        # self.make_outdirs()
         self.set_pbar()
+        download = [self.mode_0,self.mode_1,self.mode_2][self.mode]
+        download()
+        self.pbar.close()
+        safe_exit()
     
     def make_outdirs(self):
         # function that creates output folders based on mode
@@ -82,11 +88,28 @@ class stage3:
         iter = ' '*(self.post_spacing-len(iter))+iter
         self.pbar.set_postfix_str(iter)
     
-    def out_dir(self,dir):
-        # function that gives the output dir for ADB pull
-        dir = dir.split('/')
-        dir[0] = self.device
-        return '\\'.join(dir)
+    def mode_0(self):
+        for dir in self.dir_db.itertuples():
+            dst_dir = '\\'.join([self.outdir]+dir.Folder.split('/')[1:])
+            makedir(dst_dir)
+            part = self.file_db[self.file_db['FID'] == dir.Index]
+            for file in part.itertuples():
+                src_file = '/'.join([dir.Folder,file.File])
+                resp = ADB.pull(src_file,dst_dir)
+                if resp != 0: self.logs.append(f'{src_file}\n')
+                self.update_pbar(file)
+    
+    def mode_1(self):
+        pass
+
+    def mode_2(self):
+        pass
+
+    # def out_dir(self,dir):
+    #     # function that gives the output dir for ADB pull
+    #     dir = dir.split('/')
+    #     dir[0] = self.device
+    #     return '\\'.join(dir)
     
     # def download_files(self):
     #     subtask('Downloading files',2)
