@@ -4,7 +4,7 @@ from msvcrt import getch
 from numpy import cumsum, diff, linspace
 from openpyxl import load_workbook
 from openpyxl.styles import Font
-from os import environ, getcwd, makedirs, path, system
+from os import environ, getcwd, makedirs, path, remove, system
 from pandas import DataFrame, concat, read_csv
 from shutil import move, rmtree
 from subprocess import run
@@ -32,14 +32,15 @@ def initialize():
 
 def safe_exit():
     # function to exit tool properly
-    # ADB.stop()
-    # if path.isdir('cache'): rmtree('cache')
+    ADB.stop()
+    if path.isdir('cache'): rmtree('cache')
     print('\nPress any key to exit . . . ',end='',flush=True)
     getch()
     exit()
 
 def parse_config(device,cfile='data\\config.txt'):
     config = {}
+    config['device'] = device
     if path.isfile(cfile):
         # parsing values from config file
         with open(cfile,'r') as file:
@@ -56,16 +57,16 @@ def parse_config(device,cfile='data\\config.txt'):
     else: config['mode'] = 1
     try:
         makedir(config['output'])
-        if not config['output'].endswith(device): 
-            config['output'] = path.join(config['output'],device)
+        if config['output'].endswith(device): 
+            config['output'] = config['output'][:-len(device)]
     except:
-        config['output'] = path.join(getcwd(),device)
+        config['output'] = getcwd()
     print(f'Backup directory: "{config["output"]}" | Mode: {config["mode"]}')
     
     #saving config as latest
     with open(cfile,'w') as file:
-        for key in config:
-            file.write(f'{key}={config[key]}\n')
+        file.write(f'mode={config["mode"]}')
+        file.write(f'output={config["output"]}')
     return config
 
 def subtask(task=None,indent=1):

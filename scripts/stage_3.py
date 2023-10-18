@@ -1,5 +1,4 @@
 # importing libraries
-from venv import create
 from .modules import *
 
 
@@ -8,7 +7,7 @@ from .modules import *
 class stage3:
     def __init__(self,config):
         self.mode = config['mode']
-        self.outdir = config['output']
+        self.outdir = path.join(config['output'],config['device'])
         self.logs = []
         print('\nStage 3: Downloading files from the device')
     

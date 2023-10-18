@@ -84,6 +84,8 @@ class stage2:
                 file.write('\n'.join(sorted(new_types)))
             print(f'There are unrecognized file types. Add them to category database. Please refer readme.')
             safe_exit()
+        else:
+            if path.isfile('data\\new_types.txt'): remove('data\\new_types.txt')
         req_types = types.intersection(self.categories.filetypes)
         for type in req_types:
             part = self.file_db[self.file_db['Type'] == type]
