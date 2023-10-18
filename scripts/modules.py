@@ -39,7 +39,7 @@ def safe_exit():
     exit()
 
 def parse_config(device,cfile='data\\config.txt'):
-    config = {}
+    config,flag = {},False
     config['device'] = device
     if path.isfile(cfile):
         # parsing values from config file
@@ -59,14 +59,15 @@ def parse_config(device,cfile='data\\config.txt'):
         makedir(config['output'])
         if config['output'].endswith(device): 
             config['output'] = config['output'][:-len(device)]
+        flag = True
     except:
         config['output'] = getcwd()
     print(f'Backup directory: "{config["output"]}" | Mode: {config["mode"]}')
     
     #saving config as latest
     with open(cfile,'w') as file:
-        file.write(f'mode={config["mode"]}')
-        file.write(f'output={config["output"]}')
+        file.write(f'mode={config["mode"]}\n')
+        file.write(f'output={config["output"] if flag else ""}')
     return config
 
 def subtask(task=None,indent=1):
