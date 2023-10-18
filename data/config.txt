@@ -1,2 +1,2 @@
 mode=0
-output=D:\Backups\ONEPLUS A6000
+output=D:\Coding\GitHub Projects\Android-Backup-Tool\ONEPLUS A6000

@@ -126,7 +126,7 @@ class stage3:
         if path.isfile(dst):
             resp = self.safe_copy(src,dst,file)
         else:
-            resp = ADB.pull(src,dst)
+            resp = ADB.pull(src,dst).returncode
         if resp != 0: self.logs.append(f'{src}\n')
         self.update_pbar(file)
     
