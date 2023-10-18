@@ -17,7 +17,7 @@ class stage3:
         self.load_dbs()
         self.add_percentage()
         self.download_files()
-        # self.save_logs()
+        self.save_logs()
     
     def load_dbs(self):
         subtask('Loading dataframes',2)
@@ -52,13 +52,12 @@ class stage3:
     
     def download_files(self):
         subtask('Downloading files',2)
-        print('\tRunning\n')
+        print('\tRunning')
         # self.make_outdirs()
         self.set_pbar()
         download = [self.mode_0,self.mode_1,self.mode_2][self.mode]
         download()
         self.pbar.close()
-        safe_exit()
     
     def make_outdirs(self):
         # function that creates output folders based on mode
@@ -96,18 +95,40 @@ class stage3:
             for file in part.itertuples():
                 src_file = '/'.join([dir.Folder,file.File])
                 dst_file = '\\'.join([dst_dir,file.File])
-                if path.isfile(dst_file):
-                    resp = self.safe_copy(src_file,dst_file,file)
-                else:
-                    resp = ADB.pull(src_file,dst_file)
-                if resp != 0: self.logs.append(f'{src_file}\n')
-                self.update_pbar(file)
+                self.safe_download(src_file,dst_file,file)
     
     def mode_1(self):
-        pass
+        for category in self.file_db['Category'].unique():
+            dst_dir = '\\'.join([self.outdir,category])
+            makedir(dst_dir)
+            part = self.file_db[self.file_db['Category'] == category]
+            for file in part.itertuples():
+                src_dir = self.dir_db.iloc[file.FID].Folder
+                src_file = '/'.join([src_dir,file.File])
+                dst_file = '\\'.join([dst_dir,file.File])
+                self.safe_download(src_file,dst_file,file)
 
     def mode_2(self):
-        pass
+        for category in self.file_db['Category'].unique():
+            part1 = self.file_db[self.file_db['Category'] == category]
+            for type in part1['Type'].unique():
+                dst_dir = '\\'.join([self.outdir,category,type])
+                makedir(dst_dir)
+                part = part1[part1['Type'] == type]
+                for file in part.itertuples():
+                    src_dir = self.dir_db.iloc[file.FID].Folder
+                    src_file = '/'.join([src_dir,file.File])
+                    dst_file = '\\'.join([dst_dir,file.File])
+                    self.safe_download(src_file,dst_file,file)
+    
+    def safe_download(self,src,dst,file):
+        # function to safely downloades files checking with exisiting files
+        if path.isfile(dst):
+            resp = self.safe_copy(src,dst,file)
+        else:
+            resp = ADB.pull(src,dst)
+        if resp != 0: self.logs.append(f'{src}\n')
+        self.update_pbar(file)
     
     def safe_copy(self,src,dst,file):
         # function to safely copy files with same names
@@ -125,35 +146,17 @@ class stage3:
                 else:
                     move(f'Cache\\{file.File}',out)
                     return 0
-
-    # def out_dir(self,dir):
-    #     # function that gives the output dir for ADB pull
-    #     dir = dir.split('/')
-    #     dir[0] = self.device
-    #     return '\\'.join(dir)
     
-    # def download_files(self):
-    #     subtask('Downloading files',2)
-    #     print('\tRunning\n')
-    #     self.post_spacing = len(str(self.length))
-    #     format = '   Progress: {desc}%'+' |{bar}| {postfix}/'+f'{self.length}'+' [{elapsed}<{remaining}]'
-    #     self.pbar = tqdm(total=sum(self.file_db['Increment']),bar_format=format)
-    #     for i in self.dir_db.itertuples():
-    #         dir = self.out_dir(i.Folder)
-    #         makedir(dir)
-    #         part = self.file_db[self.file_db['FID'] == i.Index]
-    #         for j in part.itertuples():
-    #             src_file = '/'.join((i.Folder,j.File))
-    #             dst_file = '\\'.join((dir,j.File))
-    #             if not path.isfile(dst_file):
-    #                 op = ADB.pull(src_file,dst_file)
-    #                 if op.returncode != 0: self.logs.append(src_file+'\n')
-    #             self.pbar_update(j)
-    #     self.pbar.close()
-    
-    # def save_logs(self):
-    #     if len(self.logs):
-    #         print('There are some failed files. Please check the logs.txt')
-    #         with open('logs.txt','w',encoding=ENC) as file:
-    #             file.writelines(self.logs)
-    #     print(f'\n\nBackup complete!')
+    def save_logs(self):
+        subtask('Saving database logs',2)
+        self.dir_db.to_excel(f'{self.outdir}\\dir_db.xlsx',index=False)
+        self.file_db.to_excel(f'{self.outdir}\\file_db.xlsx',index=False)
+        if len(self.logs):
+            with open(f'{self.outdir}\\logs.txt','w',encoding=ENC) as file:
+                file.writelines(self.logs)
+            subtask()
+            print('\nThere are some failed files. Please check logs.txt in Backup directory.\n\nBackup complete!')
+            return
+        subtask()
+        print('\n\nBackup complete!')
+        
