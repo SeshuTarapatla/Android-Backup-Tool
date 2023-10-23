@@ -1,4 +1,5 @@
 @echo off
+title ADB check
 echo Checking . . . & echo.
 adb\adb.exe start-server
 echo.
