@@ -2,10 +2,11 @@
 
 from msvcrt import getch
 from numpy import cumsum, diff, linspace
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 from os import environ, getcwd, makedirs, path, remove, system
-from pandas import DataFrame, concat, read_csv
+from pandas import DataFrame, concat, read_excel
 from shutil import move, rmtree
 from subprocess import run
 from sys import exit

@@ -20,8 +20,8 @@ class stage3:
     
     def load_dbs(self):
         subtask('Loading dataframes',2)
-        self.dir_db = read_csv('cache\\dir_db.csv',encoding=ENC)
-        self.file_db = read_csv('cache\\file_db.csv',encoding=ENC)
+        self.dir_db = read_excel('cache\\dir_db.xlsx',index_col=0)
+        self.file_db = read_excel('cache\\file_db.xlsx',index_col=0)
         subtask()
     
     def add_percentage(self):
@@ -148,8 +148,12 @@ class stage3:
     
     def save_logs(self):
         subtask('Saving database logs',2)
-        self.dir_db.to_excel(f'{self.outdir}\\dir_db.xlsx',index=False)
-        self.file_db.to_excel(f'{self.outdir}\\file_db.xlsx',index=False)
+        self.wb = Workbook()
+        files = ['cache\\file_db.xlsx','cache\\dir_db.xlsx','data\\categories.xlsx']
+        titles = ['Files','Folders','Categories']
+        for i in range(3): self.add_sheet(files[i],titles[i])
+        del self.wb['Sheet']
+        self.wb.save(f'{self.outdir}\\database.xlsx')
         if len(self.logs):
             with open(f'{self.outdir}\\logs.txt','w',encoding=ENC) as file:
                 file.writelines(self.logs)
@@ -158,4 +162,18 @@ class stage3:
             return
         subtask()
         print('\n\nBackup complete!')
-        
+    
+    def add_sheet(self,file,title):
+        # function to add sheet to output database file
+        ws = self.wb.create_sheet(title)
+        wb = load_workbook(file)
+        sheet = wb.active
+        for i in range(1,sheet.max_column+1):
+            width = 0
+            ws.cell(1,i).font = Font(bold=True)
+            for j in range(1,sheet.max_row+1):
+                value = sheet.cell(j,i).value
+                ws.cell(j,i).value = value
+                wval = len(str(value))
+                if wval > width: width = wval
+            ws.column_dimensions[get_column_letter(i)].width = width+2
