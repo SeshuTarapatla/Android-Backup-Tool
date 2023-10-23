@@ -70,8 +70,8 @@ class stage2:
     
     def save_dbs(self):
         subtask('Saving parsed dataframes')
-        self.dir_db.to_csv('cache\\dir_db.csv',index=False,encoding=ENC)
-        self.file_db.to_csv('cache\\file_db.csv',index=False,encoding=ENC)
+        self.dir_db.to_excel('cache\\dir_db.xlsx',index_label='FID')
+        self.file_db.to_excel('cache\\file_db.xlsx',index_label='i')
         subtask()
     
     def categorize(self):
