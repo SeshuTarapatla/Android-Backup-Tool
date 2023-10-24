@@ -111,7 +111,7 @@ class ADB:
         # function the get connected device details
         resp = exec('adb devices').stdout.decode().splitlines()
         if len(resp) < 3:
-            print(f'No device is connected. Please refer readme.')
+            print(f'No device is connected. Please refer readme (4.2).')
             safe_exit()
         else:
             id = resp[1].split('\t')[0]

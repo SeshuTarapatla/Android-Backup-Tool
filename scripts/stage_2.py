@@ -82,7 +82,7 @@ class stage2:
             print(f'\tFailed\n')
             with open('data\\new_types.txt','w') as file:
                 file.write('\n'.join(sorted(new_types)))
-            print(f'There are unrecognized file types. Add them to category database. Please refer readme.')
+            print(f'There are unrecognized file types. Add them to category database. Please refer readme (4.3).')
             safe_exit()
         else:
             if path.isfile('data\\new_types.txt'): remove('data\\new_types.txt')
