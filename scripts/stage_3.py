@@ -38,7 +38,6 @@ class stage3:
         p3 = list(map(lambda x: round(x[0]+x[1],2),zip(p1,p2)))
         self.file_db['Percentage'] = list(map(self.percent_format,p3))
         self.file_db['Increment'] = list(map(lambda x: round(x,2),diff(p3,prepend=0)))
-        self.file_db.to_csv('cache\\file_db.csv',index=False,encoding=ENC)
     
     def percent_format(self,value):
         # function that formats percentages into proper indented strings
@@ -52,25 +51,10 @@ class stage3:
     def download_files(self):
         subtask('Downloading files',2)
         print('\tRunning')
-        # self.make_outdirs()
         self.set_pbar()
         download = [self.mode_0,self.mode_1,self.mode_2][self.mode]
         download()
         self.pbar.close()
-    
-    def make_outdirs(self):
-        # function that creates output folders based on mode
-        if self.mode == 0:
-            create_dir = lambda x:  makedir('\\'.join([self.outdir]+x.split('/')[1:]))
-            self.dir_db['Folder'].apply(create_dir)
-        elif self.mode == 1:
-            create_dir = lambda x: makedir('\\'.join([self.outdir,x]))
-            list(map(create_dir,self.file_db['Category'].unique()))
-        elif self.mode == 2:
-            create_dir = lambda x,y: makedir('\\'.join([self.outdir,x,y]))
-            for category in self.file_db['Category'].unique():
-                types = self.file_db[self.file_db['Category'] == category]['Type'].unique()
-                list(map(lambda x: create_dir(category,x),types))
     
     def set_pbar(self):
         # function that creats a progress bar for download task
@@ -87,6 +71,7 @@ class stage3:
         self.pbar.set_postfix_str(iter)
     
     def mode_0(self):
+        # function download mode 0
         for dir in self.dir_db.itertuples():
             dst_dir = '\\'.join([self.outdir]+dir.Folder.split('/')[1:])
             makedir(dst_dir)
@@ -97,6 +82,7 @@ class stage3:
                 self.safe_download(src_file,dst_file,file)
     
     def mode_1(self):
+        # function download mode 1
         for category in self.file_db['Category'].unique():
             dst_dir = '\\'.join([self.outdir,category])
             makedir(dst_dir)
@@ -108,6 +94,7 @@ class stage3:
                 self.safe_download(src_file,dst_file,file)
 
     def mode_2(self):
+        # function download mode 2
         for category in self.file_db['Category'].unique():
             part1 = self.file_db[self.file_db['Category'] == category]
             for type in part1['Type'].unique():
