@@ -2,7 +2,7 @@
 
 from msvcrt import getch
 from numpy import cumsum, diff, linspace
-from openpyxl import load_workbook, Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from os import environ, getcwd, makedirs, path, remove, system
@@ -39,12 +39,12 @@ def safe_exit():
     getch()
     exit()
 
-def parse_config(device,cfile='data\\config.txt'):
+def parse_config(device,cfg_file='data\\config.txt'):
     config,flag = {},False
     config['device'] = device
-    if path.isfile(cfile):
+    if path.isfile(cfg_file):
         # parsing values from config file
-        with open(cfile,'r') as file:
+        with open(cfg_file,'r') as file:
             for line in file.readlines():
                 prop,value = line.split('=')
                 config[prop.strip()] = value.strip()
@@ -66,7 +66,7 @@ def parse_config(device,cfile='data\\config.txt'):
     print(f'Backup directory: "{config["output"]}" | Mode: {config["mode"]}')
     
     #saving config as latest
-    with open(cfile,'w') as file:
+    with open(cfg_file,'w') as file:
         file.write(f'mode={config["mode"]}\n')
         file.write(f'output={config["output"] if flag else ""}')
     return config
@@ -165,6 +165,7 @@ class categories:
 
 
 class filename:
+    # class for file naming structure
     def __init__(self,file):
         file = path.splitext(file)
         self.file = file[0]
@@ -173,6 +174,7 @@ class filename:
         self.set_suffix()
     
     def set_suffix(self):
+        # function that adds suffix value to file name
         if self.file.endswith(')'):
             part = self.file[:-1].split('(')+['']
             if part[1].isdigit():
@@ -180,6 +182,7 @@ class filename:
                 self.file = part[0]
     
     def filename(self):
+        # function that returns file name based on suffix value
         if self.suffix == 0:
             return f'{self.file}{self.type}'
         else:
