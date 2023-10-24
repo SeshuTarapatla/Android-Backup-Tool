@@ -18,6 +18,7 @@ class stage1:
         self.clear_cache()
     
     def make_script(self):
+        # function that creates the shell script to generate file data
         commands = [
             "cd /sdcard\n",
             "ls -R -alg | grep -v '^d' > file_data.bin\n"
