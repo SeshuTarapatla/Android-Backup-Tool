@@ -92,7 +92,7 @@ class stage3:
                 src_file = '/'.join([src_dir,file.File])
                 dst_file = '\\'.join([dst_dir,file.File])
                 self.safe_download(src_file,dst_file,file)
-
+    
     def mode_2(self):
         # function download mode 2
         for category in self.file_db['Category'].unique():

@@ -13,11 +13,14 @@ from sys import exit
 from tqdm import tqdm
 
 
+
+
 # defined variables and lambda functions
 
 ENC = 'utf-8'
 exec = lambda cmd: run(cmd,capture_output=True)
 makedir = lambda dir: makedirs(dir,exist_ok=True)
+
 
 
 
