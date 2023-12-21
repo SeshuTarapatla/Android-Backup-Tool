@@ -21,7 +21,7 @@ class stage1:
         # function that creates the shell script to generate file data
         commands = [
             "cd /sdcard\n",
-            "ls -R -alg | grep -v '^d' > file_data.bin\n"
+            "ls -R -ll -a | grep -v '^d' > file_data.bin\n"
         ]
         with open('cache\\file_data.sh','w',newline='\n') as file:
             file.writelines(commands)
