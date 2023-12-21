@@ -1,3 +1,0 @@
-sdcard/.yuetu_unlock
-sdcard/Android/data/tw.nekomimi.nekogram/cache
-sdcard/Android/data/org.telegram.messenger/cache

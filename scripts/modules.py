@@ -89,7 +89,6 @@ class ADB:
         adb_dir = path.join(getcwd(),dir)
         if adb_dir not in environ['PATH']:
             environ['PATH'] += f';{adb_dir};'
-        print(f'\n"Path = {environ.get("PATH")}"\n')
     
     def start():
         # starts ADB server
