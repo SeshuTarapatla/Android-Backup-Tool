@@ -1,4 +1,4 @@
-from app import metadata
+from app import delta, metadata
 
 
 def main() -> None:
@@ -6,7 +6,10 @@ def main() -> None:
     """
     # Fetch raw metadata from device & create a datatframe
     metadata.fetch()
+    # Calculate delta dataframe for minimal operations
+    delta.calculate()
 
+    
 if __name__ == "__main__":
     main()
     
