@@ -1,0 +1,6 @@
+colorama
+humanize
+pandas
+rich
+send2trash
+uiautomator2
