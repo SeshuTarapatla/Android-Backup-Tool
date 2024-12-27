@@ -8,6 +8,7 @@ from pandas import DataFrame, concat, read_csv
 from send2trash import send2trash
 
 from app.vars import (
+    BACKUP_DIR,
     BACKUP_ROOT,
     CLEANED_METADATA,
     DATA_DIR,
@@ -138,3 +139,23 @@ def replace(src: Path, dst: Path) -> None:
         move(src, dst)
     except OSError:
         return
+
+
+def merge() -> None:
+    """Function that finally merges delta into one single device backup
+    """
+    # Create backup dir for device if not exists
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    # Move everything in delta dir to backup dir
+    # [move(x, BACKUP_DIR) for x in DELTA_DIR.iterdir()]
+    for src_file in DELTA_DIR.rglob("*"):
+        if src_file.is_file():
+            dst_file = BACKUP_DIR/src_file.relative_to(DELTA_DIR)
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            move(src_file, dst_file)
+    # delete Delta dir
+    send2trash(BACKUP_ROOT/"Delta")
+    # log updates and exit
+    log.info("Delta merged with Device backup folder")
+    log.info("Backup complete!")
+    
