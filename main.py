@@ -12,8 +12,11 @@ def main() -> None:
     with backup.session() as bkp:
         # Run the backup
         bkp.run(mock=False)
+    if delta.size() >= 1_000_000_000:
+        # if yes, create archive for online backup and merge delta with main backup dir
+        delta.archive()
 
-    
+
 if __name__ == "__main__":
     main()
     
