@@ -1,10 +1,27 @@
+from typing import NamedTuple
+
 from colorama import Fore
 from pandas import DataFrame, concat, read_csv
+
 from app.vars import DATAFRAME, DELTA_COLUMNS, DELTA_DATAFRAME, DEVICE_DATAFRAME
 from utils import UTF_8_SIG, log
 from utils.terminal import colorize
 
 
+class DeltaNamedTuple(NamedTuple):
+    """A named tuple to enable typing hints for Deltaframe itertuples.
+    """
+    Index: int
+    File: str
+    Type: str
+    Size: int
+    Size_old: int
+    Date: str
+    Date_old: str
+    Path: str
+    Kind: str
+
+    
 def calculate() -> None:
     """Function to calculate the delta between current backup and existing backup to perform minimal operations
     """
