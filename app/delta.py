@@ -95,7 +95,7 @@ def archive() -> None:
     # Copying Dataframes into delta dir
     previous_line()
     # skip if rar exe is not available
-    if RAR_EXECUTABLE.exists():
+    if not RAR_EXECUTABLE.exists():
         return
     copy2(DATAFRAME, BACKUP_ROOT/f"dataframe-{TIMESTAMP}.csv")
     copy2(DELTA_DATAFRAME, BACKUP_ROOT/f"deltaframe-{TIMESTAMP}.csv")
